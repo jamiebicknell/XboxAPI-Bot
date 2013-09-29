@@ -44,58 +44,60 @@ $get_rows = $db->query("SELECT *,COUNT(`id`) as `count` FROM `tweets` WHERE `sta
 $num_rows = $db->count($get_rows);
 if($num_rows>0) {
     while($row = $db->fetch($get_rows)) {
-        $profile = $xbox->profile($row['gamertag']);
-        $get_multi = $db->query("SELECT * FROM `tweets` WHERE `status` = '0' AND `gamertag` = '".$db->escape($row['gamertag'])."' ORDER BY `id` ASC");
-        $num_multi = $db->count($get_multi);
-        if($num_multi>0) {
-            while($multi = $db->fetch($get_multi)) {
-                $status = $multi['status'];
-                $attempts = $multi['attempts'];
-                if($attempts>=60*24*7) {
-                    $status = 3;
-                    $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
-                        'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' hasn\'t been online since your request a week ago, we\'ve had to stop checking, sorry!',
-                        'in_reply_to_status_id' => $multi['tweet_id'],
-                    ));
-                }
-                else {
-                    if($profile['code']=='200') {
-                        $data = json_decode($profile['response']);
-                        if(isset($data->Error)) {
-                            if($data->Error=='Invalid Gamertag') {
-                                $status = 2;
-                                $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
-                                    'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' isn\'t a valid Xbox gamertag',
-                                    'in_reply_to_status_id' => $multi['tweet_id'],
-                                ));
-                            }
-                        }
-                        else {
-                            $status = ($data->Player->Status->Online=='1') ? 1 : 0;
-                            if($status) {
-                                $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
-                                    'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' is currently online ' . substr($data->Player->Status->Online_Status,7),
-                                    'in_reply_to_status_id' => $multi['tweet_id'],
-                                ));
-                            }
-                            elseif($attempts==0) {
-                                if(strpos($data->Player->Status->Online_Status,'ago')) {
-                                    $data->Player->Status->Online_Status = strtolower(strstr($data->Player->Status->Online_Status,' ago',true) . ' ago');
-                                }
-                                $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
-                                    'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' is currently offline, we will tweet when they come online (' . $data->Player->Status->Online_Status . ')',
-                                    'in_reply_to_status_id' => $multi['tweet_id'],
-                                ));
-                            }
-                    
-                        }
+        if($xbox->limit()) {
+            $profile = $xbox->profile($row['gamertag']);
+            $get_multi = $db->query("SELECT * FROM `tweets` WHERE `status` = '0' AND `gamertag` = '".$db->escape($row['gamertag'])."' ORDER BY `id` ASC");
+            $num_multi = $db->count($get_multi);
+            if($num_multi>0) {
+                while($multi = $db->fetch($get_multi)) {
+                    $status = $multi['status'];
+                    $attempts = $multi['attempts'];
+                    if($attempts>=60*24*7) {
+                        $status = 3;
+                        $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
+                            'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' hasn\'t been online since your request a week ago, we\'ve had to stop checking, sorry!',
+                            'in_reply_to_status_id' => $multi['tweet_id'],
+                        ));
                     }
-                    $attempts = $multi['attempts']+1;
+                    else {
+                        if($profile['code']=='200') {
+                            $data = json_decode($profile['response']);
+                            if(isset($data->Error)) {
+                                if($data->Error=='Invalid Gamertag') {
+                                    $status = 2;
+                                    $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
+                                        'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' isn\'t a valid Xbox gamertag',
+                                        'in_reply_to_status_id' => $multi['tweet_id'],
+                                    ));
+                                }
+                            }
+                            else {
+                                $status = ($data->Player->Status->Online=='1') ? 1 : 0;
+                                if($status) {
+                                    $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
+                                        'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' is currently online ' . substr($data->Player->Status->Online_Status,7),
+                                        'in_reply_to_status_id' => $multi['tweet_id'],
+                                    ));
+                                }
+                                elseif($attempts==0) {
+                                    if(strpos($data->Player->Status->Online_Status,'ago')) {
+                                        $data->Player->Status->Online_Status = strtolower(strstr($data->Player->Status->Online_Status,' ago',true) . ' ago');
+                                    }
+                                    $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
+                                        'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' is currently offline, we will tweet when they come online (' . $data->Player->Status->Online_Status . ')',
+                                        'in_reply_to_status_id' => $multi['tweet_id'],
+                                    ));
+                                }
+                
+                            }
+                        }
+                        $attempts = $multi['attempts']+1;
+                    }
+                    $db->query("UPDATE `tweets` SET `attempts` = '".$db->escape($attempts)."',`status` = '".$db->escape($status)."' WHERE `id` = '".$db->escape($multi['id'])."' LIMIT 1");
                 }
-                $db->query("UPDATE `tweets` SET `attempts` = '".$db->escape($attempts)."',`status` = '".$db->escape($status)."' WHERE `id` = '".$db->escape($multi['id'])."' LIMIT 1");
             }
+            $db->clear($get_multi);
         }
-        $db->clear($get_multi);
     }
 }
 $db->clear($get_rows);
