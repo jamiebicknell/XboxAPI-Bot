@@ -4,6 +4,7 @@ include dirname(__FILE__) . '/config.php';
 include dirname(__FILE__) . '/includes/autoload.php';
 
 $db = new Database(DATABASE_HOST,DATABASE_USER,DATABASE_PASS,DATABASE_NAME);
+$xbox = new XboxAPI();
 $twitter = new tmhOAuth(array(
     'consumer_key'     => TWITTER_CONSUMER_KEY,
     'consumer_secret'  => TWITTER_CONSUMER_SECRET,
@@ -53,7 +54,7 @@ if($num_rows>0) {
             ));
         }
         else {
-            $profile = XboxAPI::profile($row['gamertag']);
+            $profile = $xbox->profile($row['gamertag']);
             if($profile['code']=='200') {
                 $data = json_decode($profile['response']);
                 if($data->Error=='Invalid Gamertag') {
