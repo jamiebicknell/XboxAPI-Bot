@@ -12,7 +12,7 @@ The bot will reply to your tweet and tell you whether the gamer is online or off
 
 ## Installation
 
-You'll need to create a `config.php` from the `config-sample.php` file and set up the following tables,
+You'll need to create a `config.php` from the `config-sample.php` file and set up the following tables:
 
     CREATE TABLE IF NOT EXISTS `settings` (
         `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -32,3 +32,7 @@ You'll need to create a `config.php` from the `config-sample.php` file and set u
         `status` int(11) NOT NULL,
         PRIMARY KEY (`id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;
+
+The script is required to be run via CRON every minute
+
+    * * * * * /path/to/php /path/to/script/index.php
