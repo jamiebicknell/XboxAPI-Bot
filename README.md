@@ -1,6 +1,6 @@
 # XboxAPI_Bot
 
-PHP script for replying to online requests sent on Twitter to @XboxAPI_Bot
+PHP script for replying to online requests sent on Twitter to @**[XboxAPI_Bot](http://www.twitter.com/XboxAPI_Bot)**
 
 ## How
 
