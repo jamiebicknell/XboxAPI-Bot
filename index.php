@@ -16,6 +16,8 @@ $get_since_id = $db->query("SELECT * FROM `settings` ORDER BY `id` ASC");
 $row_since_id = $db->fetch($get_since_id);
 $db->clear($get_since_id);
 $since_id = $row_since_id['value'];
+
+$command = '@' . TWITTER_SCREEN_NAME . ' isonline ';
         
 $twitter->request('GET',$twitter->url('1.1/statuses/mentions_timeline'),array(
     'include_entities' => 'false',
@@ -28,7 +30,6 @@ if($twitter->response['code']==200) {
     $data = json_decode($twitter->response['response']);
     foreach($data as $tweet) {
         $since_id = ($since_id>$tweet->id_str) ? $since_id : $tweet->id_str;
-        $command = '@' . TWITTER_SCREEN_NAME . ' isonline ';
         if(strtolower(substr($tweet->text,0,strlen($command)))==strtolower($command)) {
             $gamertag = trim(substr($tweet->text,strlen($command)));
             $db->query("INSERT INTO `tweets` (`date`,`tweet_id`,`screen_name`,`gamertag`,`attempts`,`status`) VALUES ('".date('Y-m-d H:i:s')."','".$tweet->id_str."','".$db->escape($tweet->user->screen_name)."','".$db->escape($gamertag)."','0','0')");
