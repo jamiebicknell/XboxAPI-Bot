@@ -1,6 +1,14 @@
 # XboxAPI_Bot
 
+PHP script for replying to online requests sent on Twitter to @XboxAPI_Bot
 
+## How
+
+Simply @reply the bot, and it will check the online status of the Xbox gamertag you specify. Use the following format:
+
+    @XboxAPI_Bot isonline Major Nelson
+    
+The bot will reply to your tweet and tell you whether the gamer is online or offline. If offline, the bot will recheck until the gamer comes online and will tweet when this happens.
 
 ## SQL
 
