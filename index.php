@@ -57,12 +57,14 @@ if($num_rows>0) {
             $profile = $xbox->profile($row['gamertag']);
             if($profile['code']=='200') {
                 $data = json_decode($profile['response']);
-                if($data->Error=='Invalid Gamertag') {
-                    $status = 2;
-                    $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
-                        'status'                => '@' . $row['screen_name'] . ' ' . $row['gamertag'] . ' isn\'t a valid Xbox gamertag',
-                        'in_reply_to_status_id' => $row['tweet_id'],
-                    ));
+                if(isset($data->Error)) {
+                    if($data->Error=='Invalid Gamertag') {
+                        $status = 2;
+                        $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
+                            'status'                => '@' . $row['screen_name'] . ' ' . $row['gamertag'] . ' isn\'t a valid Xbox gamertag',
+                            'in_reply_to_status_id' => $row['tweet_id'],
+                        ));
+                    }
                 }
                 else {
                     $status = ($data->Player->Status->Online=='1') ? 1 : 0;
