@@ -44,6 +44,7 @@ $num_rows = $db->count($get_rows);
 if($num_rows>0) {
     while($row = $db->fetch($get_rows)) {
         $status = $row['status'];
+        $attempts = $row['attempts'];
         if($attempts>=60*24*7) {
             $status = 3;
             $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
@@ -70,7 +71,7 @@ if($num_rows>0) {
                             'in_reply_to_status_id' => $row['tweet_id'],
                         ));
                     }
-                    elseif($attempt==0) {
+                    elseif($attempts==0) {
                         if(strpos($data->Player->Status->Online_Status,'ago')) {
                             $data->Player->Status->Online_Status = strtolower(strstr($data->Player->Status->Online_Status,' ago',true) . ' ago');
                         }
