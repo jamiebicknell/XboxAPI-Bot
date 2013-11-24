@@ -18,7 +18,7 @@ $db->clear($get_since_id);
 $since_id = $row_since_id['value'];
 
 $command = '@' . TWITTER_SCREEN_NAME . ' isonline ';
-        
+
 $twitter->request('GET',$twitter->url('1.1/statuses/mentions_timeline'),array(
     'include_entities' => 'false',
     'trim_user'        => 'false',
@@ -33,7 +33,7 @@ if($twitter->response['code']==200) {
         if(strtolower(substr($tweet->text,0,strlen($command)))==strtolower($command)) {
             $gamertag = trim(substr($tweet->text,strlen($command)));
             $db->query("INSERT INTO `tweets` (`date`,`tweet_id`,`screen_name`,`gamertag`,`attempts`,`status`) VALUES ('".date('Y-m-d H:i:s')."','".$tweet->id_str."','".$db->escape($tweet->user->screen_name)."','".$db->escape($gamertag)."','0','0')");
-        }        
+        }
         $i++;
     }
     if($i>0) {
@@ -76,7 +76,7 @@ if($num_rows>0) {
                                 $status = ($data->Player->Status->Online=='1') ? 1 : 0;
                                 if($status) {
                                     $twitter->request('POST',$twitter->url('1.1/statuses/update'),array(
-                                        'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' is currently online ' . substr($data->Player->Status->Online_Status,7),
+                                        'status'                => '@' . $multi['screen_name'] . ' ' . $multi['gamertag'] . ' is currently online ' . html_entity_decode(substr($data->Player->Status->Online_Status,7)),
                                         'in_reply_to_status_id' => $multi['tweet_id'],
                                     ));
                                 }
@@ -89,7 +89,7 @@ if($num_rows>0) {
                                         'in_reply_to_status_id' => $multi['tweet_id'],
                                     ));
                                 }
-                
+
                             }
                         }
                         $attempts = $multi['attempts']+1;
