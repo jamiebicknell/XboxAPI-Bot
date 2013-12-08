@@ -1,8 +1,8 @@
 <?php
 
 class XboxAPI {
-    
-    function limit($gamertag) {
+
+    function limit() {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://xboxapi.com/limit');
         curl_setopt($ch, CURLOPT_USERAGENT, 'XboxAPI Bot');
@@ -19,7 +19,7 @@ class XboxAPI {
         }
         return false;
     }
-    
+
     function profile($gamertag) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://xboxapi.com/profile/' . urlencode($gamertag));
@@ -31,5 +31,5 @@ class XboxAPI {
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         return array('code'=>$status,'response'=>$output);
     }
-    
+
 }
