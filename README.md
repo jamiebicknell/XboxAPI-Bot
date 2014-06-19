@@ -38,3 +38,7 @@ CREATE TABLE IF NOT EXISTS `tweets` (
 The script is required to be run via CRON every minute
 
     * * * * * /path/to/php /path/to/script/index.php
+    
+##License
+
+XboxAPI Bot is licensed under the [MIT license](http://opensource.org/licenses/MIT), see [LICENSE.md](https://github.com/jamiebicknell/XboxAPI-Bot/blob/master/LICENSE.md) for details.
