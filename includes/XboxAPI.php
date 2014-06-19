@@ -1,8 +1,10 @@
 <?php
 
-class XboxAPI {
+class XboxAPI
+{
 
-    function limit() {
+    public function limit()
+    {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://xboxapi.com/v1/limit');
         curl_setopt($ch, CURLOPT_USERAGENT, 'XboxAPI Bot');
@@ -11,16 +13,17 @@ class XboxAPI {
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
         $output = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if($status=='200') {
-            list($calls,$allowed) = explode('/',$output);
-            if($allowed-$calls>0) {
+        if ($status=='200') {
+            list($calls, $allowed) = explode('/', $output);
+            if ($allowed - $calls > 0) {
                 return true;
             }
         }
         return false;
     }
 
-    function profile($gamertag) {
+    public function profile($gamertag)
+    {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://xboxapi.com/v1/profile/' . urlencode($gamertag));
         curl_setopt($ch, CURLOPT_USERAGENT, 'XboxAPI Bot');
@@ -29,7 +32,6 @@ class XboxAPI {
         curl_setopt($ch, CURLOPT_SSLVERSION, 3);
         $output = curl_exec($ch);
         $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        return array('code'=>$status,'response'=>$output);
+        return array('code'=>$status, 'response'=>$output);
     }
-
 }
